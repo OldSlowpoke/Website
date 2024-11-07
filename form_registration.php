@@ -20,9 +20,9 @@
         }
     </style>
     <!-- Подключение библиотеки jQuery -->
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Подключение jQuery плагина Masked Input для маски ввода телефона -->
-    <script src="jquery.maskedinput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <?php
     session_start();
     ?>
@@ -115,7 +115,7 @@
             </p>
             <p>
                 <label>Телефон:<br></label>
-                <input name="Telephone" id="Telephone" type="text" size="20" maxlength="11" value="<?php echo $_SESSION['telephone']; ?>">
+                <input name="Telephone" id="Telephone" type="text" size="20" maxlength="16" value="<?php echo $_SESSION['telephone']; ?>">
             </p>
             <button type="submit" name="submit">Зарегистрироваться</button>
         </form>
