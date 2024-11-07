@@ -19,10 +19,22 @@ if (mysqli_num_rows($result) > 0) {
     $_SESSION['role'] = $user['Role'];
 
     // Перенаправление на соответствующую панель в зависимости от роли
-    if ($user['Role'] === 'admin') {
-        header('Location: admin_panel.php');
-    } else {
-        header('Location: user_panel.php');
+    switch ($user['Role']) {
+        case 'admin':
+            header('Location: admin_panel.php');
+            break;
+        case 'user':
+            header('Location: user_panel.php');
+            break;
+        case 'seller':
+            header('Location: seller_panel.php');
+            break;
+        case 'owner':
+            header('Location: owner_panel.php');
+            break;
+        default:
+            echo "Неизвестная роль";
+            exit();
     }
     exit();
 } else {
