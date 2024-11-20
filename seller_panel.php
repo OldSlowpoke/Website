@@ -47,7 +47,9 @@
         <p>Текущая дата: <span id="current_date"></span></p>
     </div>
     <div>
-        <button onclick="window.location.href='index.php'">Выход</button>
+        <form action="logout.php" method="post">
+            <button type="submit">Выход</button>
+        </form>
     </div>
     <script>
         document.getElementById('current_date').textContent = new Date().toLocaleDateString();
