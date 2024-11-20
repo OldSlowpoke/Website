@@ -1,5 +1,7 @@
 <?php
 session_start();
+include 'connect.php';
+
 // Получение данных из формы регистрации
 $login = trim(strip_tags($_POST['login']));
 $password = trim(strip_tags($_POST['password']));
@@ -8,15 +10,14 @@ $name = trim(strip_tags($_POST['name']));
 $birthday = trim(strip_tags($_POST['birthday']));
 $telephone = trim(strip_tags($_POST['telephone']));
 
-// Подключение к базе данных
-$link = mysqli_connect('localhost', 'regular_user', 'strong_password', 'DB');
-if (!$link) die('Ошибка соединения с БД');
+// Хеширование пароля с использованием password_hash
+$hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
 // Проверка, существует ли уже такой логин
 $query = "SELECT Login FROM `User` WHERE `Login` = '$login'";
-$check_login = mysqli_query($link, $query);
+$check_login = $conn->query($query);
 $_SESSION['message'] = '';
-if (mysqli_num_rows($check_login) > 0) {
+if ($check_login->num_rows > 0) {
     // Если логин занят, сохраняем данные в сессии и перенаправляем на форму регистрации
     $_SESSION['message'] = 'Введите другой логин. Введенный логин уже занят.';
     $_SESSION['login'] = $login;
@@ -30,11 +31,14 @@ if (mysqli_num_rows($check_login) > 0) {
 }
 
 // Вставка нового пользователя в базу данных
-$query = "INSERT INTO User (Login, Password, Surname, Name, Birthday, Telephone) VALUES ('$login', '$password', '$surname', '$name', '$birthday', '$telephone')";
-$res = mysqli_query($link, $query);
+$query = "INSERT INTO User (Login, Password, Surname, Name, Birthday, Telephone) VALUES ('$login', '$hashed_password', '$surname', '$name', '$birthday', '$telephone')";
+$res = $conn->query($query);
 if (!$res) {
     echo "ОШИБКА в запросе к БД";
 } else {
     echo "Запись в базу данных прошла успешно";
 }
+
+// Закрытие соединения
+$conn->close();
 ?>
