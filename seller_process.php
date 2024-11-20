@@ -77,5 +77,5 @@ if ($result->num_rows > 0) {
 
 $conn->close();
 
-include 'seller_dashboard.php';
+include 'seller_pannel.php';
 ?>
