@@ -1,5 +1,6 @@
 <?php
 session_start();
+// Начало сессии для отслеживания состояния пользователя
 ?>
 
 <!DOCTYPE html>
@@ -17,11 +18,12 @@ session_start();
         <a href="form_registration.php">Регистрация</a>
         <a href="form_login.php">Вход</a>
     <?php else: ?>
-        <!-- Если пользователь вошел в систему, отображаем кнопку в зависимости от его роли -->
+        <!-- Если пользователь вошел в систему, отображаем приветственное сообщение и ссылку на личный кабинет -->
         <?php
-        $role = $_SESSION['role'];
-        $dashboardLink = '';
+        $role = $_SESSION['role']; // Получаем роль пользователя из сессии
+        $dashboardLink = ''; // Инициализируем переменную для ссылки на личный кабинет
 
+        // Определяем ссылку на личный кабинет в зависимости от роли пользователя
         switch ($role) {
             case 'user':
                 $dashboardLink = 'user_panel.php';
@@ -39,6 +41,11 @@ session_start();
         ?>
         <h1>Добро пожаловать, <?php echo $_SESSION['login']; ?>!</h1>
         <a href="<?php echo $dashboardLink; ?>">Перейти в личный кабинет</a>
+        <?php if ($role === 'user'): ?>
+            <!-- Если пользователь имеет роль 'user', отображаем его корзину -->
+            <h2>Ваша корзина:</h2>
+            <div id="basket-list"></div>
+        <?php endif; ?>
     <?php endif; ?>
     <section class="product-list" id="product-list">
         <!-- Товары будут добавлены здесь с помощью JavaScript -->

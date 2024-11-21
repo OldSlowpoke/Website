@@ -1,3 +1,64 @@
+<?php
+session_start();
+// Начало сессии для отслеживания состояния пользователя
+
+// Проверка, вошел ли пользователь в систему и является ли он продавцом
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'seller') {
+    // Если пользователь не вошел в систему или не является продавцом, перенаправляем его на главную страницу
+    header("Location: index.php");
+    exit();
+}
+
+$servername = "localhost";
+$username = $_SESSION['login'];
+$password = "";
+$dbname = "shop";
+
+// Создаем соединение с базой данных
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Проверяем соединение
+if ($conn->connect_error) {
+    // Если соединение не удалось, выводим сообщение об ошибке и завершаем выполнение скрипта
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Получение данных о заказах из базы данных
+$query = "SELECT * FROM `Orders`";
+$result = $conn->query($query);
+$orders = $result->fetch_all(MYSQLI_ASSOC);
+
+// Обработка POST-запроса для обновления статуса заказа
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id'])) {
+    $order_id = $_POST['order_id'];
+    $new_status = $_POST['new_status'];
+    $query = "UPDATE `Orders` SET `Status` = '$new_status' WHERE `OrderID` = $order_id";
+    if ($conn->query($query) === TRUE) {
+        // Если обновление прошло успешно, устанавливаем сообщение об успехе
+        $message = "Статус заказа обновлен";
+    } else {
+        // Если обновление не удалось, устанавливаем сообщение об ошибке
+        $message = "Ошибка: " . $query . "<br>" . $conn->error;
+    }
+}
+
+// Получение имени продавца из базы данных
+$sql = "SELECT name FROM sellers WHERE login='$username'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Если найден продавец, получаем его имя
+    $row = $result->fetch_assoc();
+    $seller_name = $row['name'];
+} else {
+    // Если продавец не найден, устанавливаем имя по умолчанию
+    $seller_name = "Неизвестный продавец";
+}
+
+$conn->close();
+// Закрытие соединения с базой данных
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,8 +68,11 @@
 <body>
     <h1>Личный кабинет продавца</h1>
     <?php if (isset($message)) echo "<p>$message</p>"; ?>
+    <!-- Отображение сообщения, если оно существует -->
+
     <div>
         <h2>Ввод нового товара</h2>
+        <!-- Форма для добавления нового товара -->
         <form action="process.php" method="post">
             <label for="name">Название:</label>
             <input type="text" id="name" name="name" required><br>
@@ -19,8 +83,10 @@
             <button type="submit" name="add_product">Добавить товар</button>
         </form>
     </div>
+
     <div>
         <h2>Коррекция данных товара</h2>
+        <!-- Форма для обновления данных товара -->
         <form action="process.php" method="post">
             <label for="edit_id">ID товара:</label>
             <input type="number" id="edit_id" name="edit_id" required><br>
@@ -33,25 +99,71 @@
             <button type="submit" name="edit_product">Обновить товар</button>
         </form>
     </div>
+
     <div>
         <h2>Удаление товара</h2>
+        <!-- Форма для удаления товара -->
         <form action="process.php" method="post">
             <label for="delete_id">ID товара:</label>
             <input type="number" id="delete_id" name="delete_id" required><br>
             <button type="submit" name="delete_product">Удалить товар</button>
         </form>
     </div>
+
     <div>
         <h2>Личные данные продавца</h2>
+        <!-- Отображение личных данных продавца -->
         <p>Имя: <?php echo htmlspecialchars($seller_name); ?></p>
         <p>Текущая дата: <span id="current_date"></span></p>
     </div>
+
     <div>
+        <h2>Заказы</h2>
+        <!-- Таблица заказов -->
+        <table border="1">
+            <tr>
+                <th>ID заказа</th>
+                <th>ID пользователя</th>
+                <th>Название товара</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+            <?php foreach ($orders as $order): ?>
+                <tr>
+                    <td><?php echo $order['OrderID']; ?></td>
+                    <td><?php echo $order['UserID']; ?></td>
+                    <td><?php echo $order['ProductName']; ?></td>
+                    <td><?php echo $order['Quantity']; ?></td>
+                    <td><?php echo $order['Price']; ?></td>
+                    <td><?php echo $order['Status']; ?></td>
+                    <td>
+                        <!-- Форма для обновления статуса заказа -->
+                        <form action="" method="post">
+                            <input type="hidden" name="order_id" value="<?php echo $order['OrderID']; ?>">
+                            <select name="new_status">
+                                <option value="ожидает подтверждения" <?php if ($order['Status'] == 'ожидает подтверждения') echo 'selected'; ?>>Ожидает подтверждения</option>
+                                <option value="подтвержден" <?php if ($order['Status'] == 'подтвержден') echo 'selected'; ?>>Подтвержден</option>
+                                <option value="отменен" <?php if ($order['Status'] == 'отменен') echo 'selected'; ?>>Отменен</option>
+                            </select>
+                            <button type="submit">Обновить статус</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+
+    <div>
+        <!-- Форма для выхода из системы -->
         <form action="logout.php" method="post">
             <button type="submit">Выход</button>
         </form>
     </div>
+
     <script>
+        // Установка текущей даты в элемент с id "current_date"
         document.getElementById('current_date').textContent = new Date().toLocaleDateString();
     </script>
 </body>
