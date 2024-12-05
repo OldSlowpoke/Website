@@ -13,10 +13,8 @@ $servername = "localhost";
 $username = $_SESSION['login'];
 $password = "";
 $dbname = "shop";
-
 // Создаем соединение с базой данных
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 // Проверяем соединение
 if ($conn->connect_error) {
     // Если соединение не удалось, выводим сообщение об ошибке и завершаем выполнение скрипта
@@ -45,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id'])) {
 // Получение имени продавца из базы данных
 $sql = "SELECT name FROM sellers WHERE login='$username'";
 $result = $conn->query($sql);
-
 if ($result->num_rows > 0) {
     // Если найден продавец, получаем его имя
     $row = $result->fetch_assoc();
@@ -55,10 +52,21 @@ if ($result->num_rows > 0) {
     $seller_name = "Неизвестный продавец";
 }
 
+// Обработка POST-запроса для получения данных товара
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_product'])) {
+    $product_id_or_name = $_POST['product_id_or_name'];
+    $query = "SELECT * FROM products WHERE id = '$product_id_or_name' OR name = '$product_id_or_name'";
+    $result = $conn->query($query);
+    if ($result->num_rows > 0) {
+        $product_data = $result->fetch_assoc();
+    } else {
+        $product_data = null;
+    }
+}
+
 $conn->close();
 // Закрытие соединения с базой данных
 ?>
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -69,11 +77,10 @@ $conn->close();
     <h1>Личный кабинет продавца</h1>
     <?php if (isset($message)) echo "<p>$message</p>"; ?>
     <!-- Отображение сообщения, если оно существует -->
-
     <div>
         <h2>Ввод нового товара</h2>
         <!-- Форма для добавления нового товара -->
-        <form action="process.php" method="post">
+        <form action="seller_process.php" method="post">
             <label for="name">Название:</label>
             <input type="text" id="name" name="name" required><br>
             <label for="description">Описание:</label>
@@ -83,40 +90,43 @@ $conn->close();
             <button type="submit" name="add_product">Добавить товар</button>
         </form>
     </div>
-
     <div>
         <h2>Коррекция данных товара</h2>
-        <!-- Форма для обновления данных товара -->
-        <form action="process.php" method="post">
-            <label for="edit_id">ID товара:</label>
-            <input type="number" id="edit_id" name="edit_id" required><br>
-            <label for="edit_name">Название:</label>
-            <input type="text" id="edit_name" name="edit_name"><br>
-            <label for="edit_description">Описание:</label>
-            <textarea id="edit_description" name="edit_description"></textarea><br>
-            <label for="edit_price">Цена:</label>
-            <input type="number" step="0.01" id="edit_price" name="edit_price"><br>
-            <button type="submit" name="edit_product">Обновить товар</button>
+        <!-- Форма для получения данных товара -->
+        <form action="" method="post">
+            <label for="product_id_or_name">ID или название товара:</label>
+            <input type="text" id="product_id_or_name" name="product_id_or_name" required><br>
+            <button type="submit" name="get_product">Получить данные товара</button>
         </form>
+        <?php if (isset($product_data)): ?>
+            <!-- Форма для обновления данных товара -->
+            <form action="seller_process.php" method="post">
+                <input type="hidden" name="edit_id" value="<?php echo $product_data['id']; ?>">
+                <label for="edit_name">Название:</label>
+                <input type="text" id="edit_name" name="edit_name" value="<?php echo $product_data['name']; ?>"><br>
+                <label for="edit_description">Описание:</label>
+                <textarea id="edit_description" name="edit_description"><?php echo $product_data['description']; ?></textarea><br>
+                <label for="edit_price">Цена:</label>
+                <input type="number" step="0.01" id="edit_price" name="edit_price" value="<?php echo $product_data['price']; ?>"><br>
+                <button type="submit" name="edit_product">Обновить товар</button>
+            </form>
+        <?php endif; ?>
     </div>
-
     <div>
         <h2>Удаление товара</h2>
         <!-- Форма для удаления товара -->
-        <form action="process.php" method="post">
+        <form action="seller_process.php" method="post">
             <label for="delete_id">ID товара:</label>
             <input type="number" id="delete_id" name="delete_id" required><br>
             <button type="submit" name="delete_product">Удалить товар</button>
         </form>
     </div>
-
     <div>
         <h2>Личные данные продавца</h2>
         <!-- Отображение личных данных продавца -->
         <p>Имя: <?php echo htmlspecialchars($seller_name); ?></p>
         <p>Текущая дата: <span id="current_date"></span></p>
     </div>
-
     <div>
         <h2>Заказы</h2>
         <!-- Таблица заказов -->
@@ -154,14 +164,12 @@ $conn->close();
             <?php endforeach; ?>
         </table>
     </div>
-
     <div>
         <!-- Форма для выхода из системы -->
         <form action="logout.php" method="post">
             <button type="submit">Выход</button>
         </form>
     </div>
-
     <script>
         // Установка текущей даты в элемент с id "current_date"
         document.getElementById('current_date').textContent = new Date().toLocaleDateString();
