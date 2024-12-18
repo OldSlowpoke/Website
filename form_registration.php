@@ -117,6 +117,35 @@
                 <label>Телефон:<br></label>
                 <input name="Telephone" id="Telephone" type="text" size="20" maxlength="16" value="<?php echo $_SESSION['telephone']; ?>">
             </p>
+            <p>
+                <label>Телефон:<br></label>
+                <input name="Telephone" id="Telephone" type="text" size="20" maxlength="16" value="<?php echo $_SESSION['telephone']; ?>">
+            </p>
+            <!-- Новые поля для адреса -->
+            <p>
+                <label>Страна:<br></label>
+                <input name="country" id="country" type="text" size="20" maxlength="50" value="<?php echo $_SESSION['country']; ?>" required onchange="nam('country')">
+            </p>
+            <p>
+                <label>Город:<br></label>
+                <input name="city" id="city" type="text" size="20" maxlength="50" value="<?php echo $_SESSION['city']; ?>" required onchange="nam('city')">
+            </p>
+            <p>
+                <label>Улица:<br></label>
+                <input name="street" id="street" type="text" size="20" maxlength="100" value="<?php echo $_SESSION['street']; ?>" required>
+            </p>
+            <p>
+                <label>Номер дома:<br></label>
+                <input name="house" id="house" type="text" size="10" maxlength="10" value="<?php echo $_SESSION['house']; ?>" required>
+            </p>
+            <p>
+                <label>Корпус:<br></label>
+                <input name="building" id="building" type="text" size="10" maxlength="10" value="<?php echo $_SESSION['building']; ?>">
+            </p>
+            <p>
+                <label>Квартира:<br></label>
+                <input name="apartment" id="apartment" type="text" size="10" maxlength="10" value="<?php echo $_SESSION['apartment']; ?>">
+            </p>
             <button type="submit" name="submit">Зарегистрироваться</button>
         </form>
     </div>

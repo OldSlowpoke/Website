@@ -10,6 +10,14 @@ $name = trim(strip_tags($_POST['name']));
 $birthday = trim(strip_tags($_POST['birthday']));
 $telephone = trim(strip_tags($_POST['telephone']));
 
+// Получение данных адреса
+$country = trim(strip_tags($_POST['country']));
+$city = trim(strip_tags($_POST['city']));
+$street = trim(strip_tags($_POST['street']));
+$house = trim(strip_tags($_POST['house']));
+$building = trim(strip_tags($_POST['building']));
+$apartment = trim(strip_tags($_POST['apartment']));
+
 // Хеширование пароля с использованием password_hash
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
@@ -26,19 +34,46 @@ if ($check_login->num_rows > 0) {
     $_SESSION['name'] = $name;
     $_SESSION['birthday'] = $birthday;
     $_SESSION['telephone'] = $telephone;
+    // Сохранение данных адреса в сессии
+    $_SESSION['country'] = $country;
+    $_SESSION['city'] = $city;
+    $_SESSION['street'] = $street;
+    $_SESSION['house'] = $house;
+    $_SESSION['building'] = $building;
+    $_SESSION['apartment'] = $apartment;
     header('Location: form_registration.php');
     exit();
 }
 
-// Вставка нового пользователя в базу данных
-$query = "INSERT INTO User (Login, Password, Surname, Name, Birthday, Telephone) VALUES ('$login', '$hashed_password', '$surname', '$name', '$birthday', '$telephone')";
-$res = $conn->query($query);
-if (!$res) {
-    echo "ОШИБКА в запросе к БД";
-} else {
-    echo "Запись в базу данных прошла успешно";
-}
+// Начинаем транзакцию
+$conn->begin_transaction();
 
+try {
+    // Вставка нового пользователя в базу данных
+    $query = "INSERT INTO User (Login, Password, Surname, Name, Birthday, Telephone) 
+              VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssssss", $login, $hashed_password, $surname, $name, $birthday, $telephone);
+    $stmt->execute();
+    
+    // Получаем ID только что созданного пользователя
+    $user_id = $conn->insert_id;
+    
+    // Вставка адреса пользователя
+    $query = "INSERT INTO Address (UserID, Country, City, Street, House, Building, Apartment) 
+              VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("issssss", $user_id, $country, $city, $street, $house, $building, $apartment);
+    $stmt->execute();
+    
+    // Если все запросы выполнены успешно, фиксируем транзакцию
+    $conn->commit();
+    echo "Регистрация прошла успешно";
+} catch (Exception $e) {
+    // В случае ошибки откатываем все изменения
+    $conn->rollback();
+    echo "ОШИБКА: " . $e->getMessage();
+}
 // Закрытие соединения
 $conn->close();
 ?>

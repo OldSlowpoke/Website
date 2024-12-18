@@ -17,7 +17,7 @@ if ($_SESSION['role'] !== 'owner') {
 include 'connect.php';
 
 // Получение личных данных владельца
-$owner_query = "SELECT * FROM users WHERE login = '{$_SESSION['login']}'";
+$owner_query = "SELECT * FROM User WHERE Login = '{$_SESSION['login']}'";
 $owner_result = $conn->query($owner_query);
 $owner_data = $owner_result->fetch_assoc();
 
@@ -28,22 +28,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_profit'])) {
 
     // Расчет общей прибыли
     $sales_query = "
-        SELECT total_amount AS total_sales
-        FROM orders
-        WHERE order_type = 'продажа' AND order_date BETWEEN '$start_date' AND '$end_date'
+        SELECT SUM(TotalAmount) AS total_sales
+        FROM Orders
+        WHERE order_type = 'продажа' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
     ";
     $sales_result = $conn->query($sales_query);
     $sales_data = $sales_result->fetch_assoc();
-    $total_sales = $sales_data['total_sales'];
+    $total_sales = $sales_data['total_sales'] ?? 0;
 
     $purchases_query = "
-        SELECT total_amount AS total_purchases
-        FROM orders
-        WHERE order_type = 'закупка' AND order_date BETWEEN '$start_date' AND '$end_date'
+        SELECT SUM(TotalAmount) AS total_purchases
+        FROM Orders
+        WHERE order_type = 'закупка' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
     ";
     $purchases_result = $conn->query($purchases_query);
     $purchases_data = $purchases_result->fetch_assoc();
-    $total_purchases = $purchases_data['total_purchases'];
+    $total_purchases = $purchases_data['total_purchases'] ?? 0;
 
     $total_profit = $total_sales - $total_purchases; // Прибыль
 }
@@ -54,15 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_rating'])) {
     $end_date = $_POST['end_date'];
 
     // Расчет рейтинга товаров
-    $rating_query = "SELECT p.id, p.name,
-       SUM(CASE WHEN o.order_type = 'продажа' THEN oi.quantity * oi.price
-                WHEN o.order_type = 'закупка' THEN -oi.quantity * oi.price
+    $rating_query = "SELECT p.ProductID, p.Name,
+       SUM(CASE WHEN o.order_type = 'продажа' THEN oi.Quantity * oi.Price
+                WHEN o.order_type = 'закупка' THEN -oi.Quantity * oi.Price
            END) AS total_profit
-        FROM order_items oi
-        JOIN orders o ON oi.order_id = o.order_id
-        JOIN products p ON oi.product_id = p.id
-        WHERE o.order_date BETWEEN '$start_date' AND '$end_date'
-        GROUP BY p.id, p.name
+        FROM OrderItems oi
+        JOIN Orders o ON oi.OrderID = o.OrderID
+        JOIN Products p ON oi.ProductID = p.ProductID
+        WHERE o.CreatedAt BETWEEN '$start_date' AND '$end_date'
+        GROUP BY p.ProductID, p.Name
         ORDER BY total_profit DESC
         LIMIT 3
     ";
@@ -85,8 +85,8 @@ $conn->close();
 
     <!-- Личные данные владельца -->
     <h2>Личные данные владельца</h2>
-    <p>Имя: <?php echo htmlspecialchars($owner_data['name']); ?></p>
-    <p>Email: <?php echo htmlspecialchars($owner_data['login']); ?></p>
+    <p>Имя: <?php echo htmlspecialchars($owner_data['Name']); ?></p>
+    <p>Email: <?php echo htmlspecialchars($owner_data['Login']); ?></p>
 
     <!-- Текущая дата -->
     <p>Текущая дата: <?php echo date('Y-m-d'); ?></p>
@@ -117,7 +117,7 @@ $conn->close();
         <h3>Рейтинг товаров:</h3>
         <ul>
             <?php foreach ($rating_data as $item): ?>
-                <li><?php echo $item['name']; ?> - <?php echo $item['total_profit']; ?> руб.</li>
+                <li><?php echo $item['Name']; ?> - <?php echo $item['total_profit']; ?> руб.</li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>

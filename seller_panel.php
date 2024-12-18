@@ -41,12 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id'])) {
 }
 
 // Получение имени продавца из базы данных
-$sql = "SELECT name FROM sellers WHERE login='$username'";
+$sql = "SELECT Name FROM user WHERE login='$username'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     // Если найден продавец, получаем его имя
     $row = $result->fetch_assoc();
-    $seller_name = $row['name'];
+    $seller_name = $row['Name'];
 } else {
     // Если продавец не найден, устанавливаем имя по умолчанию
     $seller_name = "Неизвестный продавец";
