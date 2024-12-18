@@ -2,7 +2,7 @@
 include 'connect.php';
 
 // SQL-запрос для получения данных о товарах
-$sql = "SELECT id, name, description, image, price FROM products";
+$sql = "SELECT ProductID, Name, Description, Image, Price FROM Products";
 $result = $conn->query($sql);
 
 $products = [];

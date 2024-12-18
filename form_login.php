@@ -30,7 +30,7 @@
         <form action="login.php" method="POST">
             <p>
                 <label>Ваш логин (E-mail):<br></label>
-                <input name="login" id="login" type="email" size="20" maxlength="15" required>
+                <input name="login" id="login" type="email" size="20" maxlength="30" required>
             </p>
             <p>
                 <label>Ваш пароль:<br></label>

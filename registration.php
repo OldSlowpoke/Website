@@ -22,7 +22,7 @@ $apartment = trim(strip_tags($_POST['apartment']));
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
 // Проверка, существует ли уже такой логин
-$query = "SELECT Login FROM `User` WHERE `Login` = '$login'";
+$query = "SELECT Login FROM `Users` WHERE `Login` = '$login'";
 $check_login = $conn->query($query);
 $_SESSION['message'] = '';
 if ($check_login->num_rows > 0) {
@@ -50,7 +50,7 @@ $conn->begin_transaction();
 
 try {
     // Вставка нового пользователя в базу данных
-    $query = "INSERT INTO User (Login, Password, Surname, Name, Birthday, Telephone) 
+    $query = "INSERT INTO Users (Login, Password, Surname, Name, Birthday, Telephone) 
               VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ssssss", $login, $hashed_password, $surname, $name, $birthday, $telephone);
@@ -76,4 +76,5 @@ try {
 }
 // Закрытие соединения
 $conn->close();
+header('Location: login.php');
 ?>

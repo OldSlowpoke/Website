@@ -89,7 +89,7 @@
         <form action="registration.php" method="POST">
             <p>
                 <label>Ваш логин (E-mail):<br></label>
-                <input name="login" id="login" type="email" size="20" maxlength="15" required>
+                <input name="login" id="login" type="email" size="20" maxlength="30" required>
             </p>
             <p>
                 <label>Ваш пароль:<br></label>
@@ -112,10 +112,6 @@
             <p>
                 <label>Дата рождения:<br></label>
                 <input name="birthday" type="date" size="20" value="<?php echo $_SESSION['birthday']; ?>" required>
-            </p>
-            <p>
-                <label>Телефон:<br></label>
-                <input name="Telephone" id="Telephone" type="text" size="20" maxlength="16" value="<?php echo $_SESSION['telephone']; ?>">
             </p>
             <p>
                 <label>Телефон:<br></label>

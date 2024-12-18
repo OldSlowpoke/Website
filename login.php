@@ -7,7 +7,7 @@ $login = trim(strip_tags($_POST['login']));
 $password = trim(strip_tags($_POST['password']));
 
 // Проверка логина
-$query = "SELECT * FROM `User` WHERE `Login` = '$login'";
+$query = "SELECT * FROM `Users` WHERE `Login` = '$login'";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
@@ -17,6 +17,7 @@ if ($result->num_rows > 0) {
         // Если пароль верен, сохраняем логин и роль в сессии
         $_SESSION['login'] = $login;
         $_SESSION['role'] = $user['Role'];
+        $_SESSION['user_id'] = $user['UserID'];
 
         // Перенаправление на соответствующую панель в зависимости от роли
         switch ($user['Role']) {
@@ -24,7 +25,7 @@ if ($result->num_rows > 0) {
                 header('Location: admin_panel.php');
                 break;
             case 'user':
-                header('Location: user_panel.php');
+                header('Location: index.php');
                 break;
             case 'seller':
                 header('Location: seller_panel.php');

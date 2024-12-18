@@ -1,6 +1,7 @@
 <?php
 session_start();
 // Начало сессии для отслеживания состояния пользователя
+include 'connect.php';
 ?>
 
 <!DOCTYPE html>
@@ -41,15 +42,16 @@ session_start();
         ?>
         <h1>Добро пожаловать, <?php echo $_SESSION['login']; ?>!</h1>
         <a href="<?php echo $dashboardLink; ?>">Перейти в личный кабинет</a>
-        <?php if ($role === 'user'): ?>
-            <!-- Если пользователь имеет роль 'user', отображаем его корзину -->
-            <h2>Ваша корзина:</h2>
-            <div id="basket-list"></div>
-        <?php endif; ?>
+        
+        
+        
     <?php endif; ?>
+    <!-- Если пользователь имеет роль 'user', отображаем его корзину -->
+    <h2>Ваша корзина:</h2>
+    <div id="basket-list"></div>
     <section class="product-list" id="product-list">
         <!-- Товары будут добавлены здесь с помощью JavaScript -->
     </section>
-    <script src="scripts.php"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>

@@ -17,7 +17,7 @@ if ($_SESSION['role'] !== 'owner') {
 include 'connect.php';
 
 // Получение личных данных владельца
-$owner_query = "SELECT * FROM User WHERE Login = '{$_SESSION['login']}'";
+$owner_query = "SELECT * FROM Users WHERE Login = '{$_SESSION['login']}'";
 $owner_result = $conn->query($owner_query);
 $owner_data = $owner_result->fetch_assoc();
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_profit'])) {
     $sales_query = "
         SELECT SUM(TotalAmount) AS total_sales
         FROM Orders
-        WHERE order_type = 'продажа' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
+        WHERE OrderType = 'продажа' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
     ";
     $sales_result = $conn->query($sales_query);
     $sales_data = $sales_result->fetch_assoc();
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_profit'])) {
     $purchases_query = "
         SELECT SUM(TotalAmount) AS total_purchases
         FROM Orders
-        WHERE order_type = 'закупка' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
+        WHERE OrderType = 'закупка' AND CreatedAt BETWEEN '$start_date' AND '$end_date'
     ";
     $purchases_result = $conn->query($purchases_query);
     $purchases_data = $purchases_result->fetch_assoc();
@@ -55,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['get_rating'])) {
 
     // Расчет рейтинга товаров
     $rating_query = "SELECT p.ProductID, p.Name,
-       SUM(CASE WHEN o.order_type = 'продажа' THEN oi.Quantity * oi.Price
-                WHEN o.order_type = 'закупка' THEN -oi.Quantity * oi.Price
+       SUM(CASE WHEN o.OrderType = 'продажа' THEN oi.Quantity * oi.Price
+                WHEN o.OrderType = 'закупка' THEN -oi.Quantity * oi.Price
            END) AS total_profit
         FROM OrderItems oi
         JOIN Orders o ON oi.OrderID = o.OrderID

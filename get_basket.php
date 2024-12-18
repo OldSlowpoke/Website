@@ -8,9 +8,13 @@ if (isset($_SESSION['basket'])) {
 
     foreach ($basket as $item) {
         $product_id = $item['id_tovara'];
-        $query = "SELECT name FROM Products WHERE id = $product_id";
+        $query = "SELECT Name FROM Products WHERE ProductID = $product_id";
         $result = $conn->query($query);
-        $product_name = $result->fetch_assoc()['name'];
+        if ($result && $result->num_rows > 0) {
+            $product_name = $result->fetch_assoc()['Name'];
+        } else {
+            $product_name = 'Неизвестный товар';
+        }
 
         $basket_data[] = [
             'id_tovara' => $item['id_tovara'],

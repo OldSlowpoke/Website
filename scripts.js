@@ -1,8 +1,3 @@
-<?php
-header("Content-Type: application/javascript");
-// Устанавливаем заголовок для отправки JavaScript кода
-?>
-
 document.addEventListener('DOMContentLoaded', function() {
     // Обработчик события загрузки DOM
     // Этот обработчик выполняется после полной загрузки HTML-документа
@@ -19,16 +14,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Создание элемента для каждого товара
                 const productDiv = document.createElement('div');
                 productDiv.className = 'product';
-                // Вставка HTML-кода для отображения товара
-                productDiv.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}">
-                    <h2>${product.name}</h2>
-                    <p>${product.description}</p>
-                    <p>Цена: ${product.price} руб.</p>
-                    <label for="quantity${product.id}">Количество:</label>
-                    <input type="number" id="quantity${product.id}" name="quantity${product.id}" min="1" value="1">
-                    <button onclick="addToCart(${product.id}, ${product.price})">Добавить в корзину</button>
-                `;
+
+                // Создание элементов для товара
+                const img = document.createElement('img');
+                img.src = product.Image;
+                img.alt = product.Name;
+
+                const name = document.createElement('h2');
+                name.textContent = product.Name;
+
+                const description = document.createElement('p');
+                description.textContent = product.Description;
+
+                const price = document.createElement('p');
+                price.textContent = `Цена: ${product.Price} руб.`;
+
+                const label = document.createElement('label');
+                label.textContent = 'Количество:';
+                label.htmlFor = `quantity${product.ProductID}`;
+
+                const quantityInput = document.createElement('input');
+                quantityInput.type = 'number';
+                quantityInput.id = `quantity${product.ProductID}`;
+                quantityInput.name = `quantity${product.ProductID}`;
+                quantityInput.min = '1';
+                quantityInput.value = '1';
+
+                const addButton = document.createElement('button');
+                addButton.textContent = 'Добавить в корзину';
+                addButton.addEventListener('click', () => addToCart(product.ProductID, product.Price));
+
+                // Добавление элементов в productDiv
+                productDiv.appendChild(img);
+                productDiv.appendChild(name);
+                productDiv.appendChild(description);
+                productDiv.appendChild(price);
+                productDiv.appendChild(label);
+                productDiv.appendChild(quantityInput);
+                productDiv.appendChild(addButton);
+
                 // Добавление элемента товара в список товаров
                 productList.appendChild(productDiv);
             });
@@ -49,11 +73,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(item => {
                     const basketItem = document.createElement('div');
                     basketItem.className = 'basket-item';
-                    // Вставка HTML-кода для отображения товара в корзине
-                    basketItem.innerHTML = `
-                        <p>${item.name} - ${item.kol_vo} x ${item.stoimost} руб.</p>
-                        <button onclick="removeFromCart(${item.id_tovara})">Удалить из корзины</button>
-                    `;
+
+                    const itemText = document.createElement('p');
+                    itemText.textContent = `${item.name} - ${item.kol_vo} x ${item.stoimost} руб.`;
+
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Удалить из корзины';
+                    removeButton.addEventListener('click', () => removeFromCart(item.id_tovara));
+
+                    // Добавление элементов в basketItem
+                    basketItem.appendChild(itemText);
+                    basketItem.appendChild(removeButton);
+
                     // Добавление элемента товара в корзину
                     basketList.appendChild(basketItem);
                 });
@@ -93,11 +124,18 @@ function addToCart(productId, productPrice) {
                     data.forEach(item => {
                         const basketItem = document.createElement('div');
                         basketItem.className = 'basket-item';
-                        // Вставка HTML-кода для отображения товара в корзине
-                        basketItem.innerHTML = `
-                            <p>${item.name} - ${item.kol_vo} x ${item.stoimost} руб.</p>
-                            <button onclick="removeFromCart(${item.id_tovara})">Удалить из корзины</button>
-                        `;
+
+                        const itemText = document.createElement('p');
+                        itemText.textContent = `${item.name} - ${item.kol_vo} x ${item.stoimost} руб.`;
+
+                        const removeButton = document.createElement('button');
+                        removeButton.textContent = 'Удалить из корзины';
+                        removeButton.addEventListener('click', () => removeFromCart(item.id_tovara));
+
+                        // Добавление элементов в basketItem
+                        basketItem.appendChild(itemText);
+                        basketItem.appendChild(removeButton);
+
                         // Добавление элемента товара в корзину
                         basketList.appendChild(basketItem);
                     });
@@ -140,11 +178,18 @@ function removeFromCart(productId) {
                     data.forEach(item => {
                         const basketItem = document.createElement('div');
                         basketItem.className = 'basket-item';
-                        // Вставка HTML-кода для отображения товара в корзине
-                        basketItem.innerHTML = `
-                            <p>${item.name} - ${item.kol_vo} x ${item.stoimost} руб.</p>
-                            <button onclick="removeFromCart(${item.id_tovara})">Удалить из корзины</button>
-                        `;
+
+                        const itemText = document.createElement('p');
+                        itemText.textContent = `${item.name} - ${item.kol_vo} x ${item.stoimost} руб.`;
+
+                        const removeButton = document.createElement('button');
+                        removeButton.textContent = 'Удалить из корзины';
+                        removeButton.addEventListener('click', () => removeFromCart(item.id_tovara));
+
+                        // Добавление элементов в basketItem
+                        basketItem.appendChild(itemText);
+                        basketItem.appendChild(removeButton);
+
                         // Добавление элемента товара в корзину
                         basketList.appendChild(basketItem);
                     });
